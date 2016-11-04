@@ -1,4 +1,22 @@
 ---
+sentry__apt__sources:
+  - uri:        'http://httpredir.debian.org/debian'
+    comment:    'Debian Stretch repository'
+    type:       'deb'
+    suite:      'stretch'
+    components: 'main'
+    distribution: 'Debian'
+
+sentry__apt_preferences__list:
+  - package: 'cmake'
+    by_role: 'debops.sentry'
+    suffix: '_Debian'
+    raw: |
+      Explanation: Install cmake from testing. Sentry 8.10.x needs symsynd which needs CMake 3.4.3+
+      Package: cmake
+      Pin: release o=Debian,n=stretch
+      Pin-Priority: 500
+
 sentry__base_packages:
   - python-setuptools
   - python-pip
@@ -13,10 +31,11 @@ sentry__base_packages:
   - libxslt-dev
   - libyaml-dev
   - postgresql-server-dev-9.4
+  - cmake
 
 sentry__packages: []
 
-sentry__version: '8.8.0'
+sentry__version: '8.10.0'
 
 sentry__domain: 'sentry.test.de'
 
