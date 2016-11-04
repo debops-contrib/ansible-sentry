@@ -21,6 +21,11 @@ ansigenome_info:
       twitter: 'timitos'
       github: 'timitos'
 
+    - name: 'Philip Bauer'
+      email: 'bauer@starzel.de'
+      twitter: 'Starzelde'
+      github: 'pbauer'
+
   synopsis: |
     [Sentry](https://sentry.io/) is a error logging server 
 
