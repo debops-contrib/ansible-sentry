@@ -1,0 +1,23 @@
+---
+
+ansigenome_info:
+  galaxy_url: ""
+  github_url: "https://github.com/starzel/ansible-sentry"
+  git_branch: "master"
+
+  travis: False
+
+  license_url: 'https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)'
+
+  authors:
+
+    - name:  'Steffen Lindner'
+      email: 'mail@steffen-lindner.de'
+      twitter: 'gomezr'
+      github: 'gomez'
+
+  synopsis: |
+    [Sentry](https://sentry.io/) is a error logging server 
+
+    The `debops.sentry` role can be used to install and manage `sentry` configuration
+    The server is configured using inventory variables. 
