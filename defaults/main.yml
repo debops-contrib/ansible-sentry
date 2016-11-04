@@ -71,9 +71,8 @@ sentry__postgresql_database:
   name: '{{ sentry__database_name }}'
   owner: '{{ sentry__database_user }}'
 
-sentry__superusers:
-  - email: 'services@vth.systems'
-    password: 'admin'
+sentry__superusers: '{{ lookup("template", "lookup/sentry__config_admins.j2") | from_yaml }}'
+sentry__superuser_password_length: '32'
 
 sentry__nginx_upstream:
   name: 'sentry'

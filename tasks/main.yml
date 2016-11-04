@@ -18,6 +18,19 @@
     - '{{ sentry__pip_base_packages }}'
     - '{{ sentry__pip_packages }}'
 
+- name: Add sentry group
+  group:
+      name: '{{ sentry__group }}'
+      state: present
+      system: True
+
+- name: Add sentry user
+  user:
+      name: '{{ sentry__user }}'
+      group: '{{ sentry__group }}'
+      system: True
+      shell: '/usr/sbin/nologin'
+
 - name: Make directories
   file:
     path: '{{ item }}'
@@ -59,19 +72,6 @@
       dest: '/etc/systemd/system/sentry-cron.service'
   notify: Restart sentry services
 
-- name: Add sentry group
-  group:
-      name: '{{ sentry__group }}'
-      state: present
-      system: True
-
-- name: Add sentry user
-  user:
-      name: '{{ sentry__user }}'
-      group: '{{ sentry__group }}'
-      system: True
-      shell: '/usr/sbin/nologin'
-
 - name: Enable sentry services
   service:
       name: '{{ item }}'
@@ -96,12 +96,12 @@
   command: |
     /usr/local/bin/sentry
       --config /etc/sentry createuser
-      --email '{{ item.email }}'
-      --password '{{ item.password }}'
+      --email '{{ item }}'
+      --password '{{ lookup("password", secret + "/credentials/" + ansible_fqdn + "/sentry/" + item + "/password length=" + sentry__superuser_password_length) }}'
       --superuser
       --no-input
   with_items: '{{ sentry__superusers }}'
-  when: item.email not in sentry_users.emails
+  when: item not in sentry_users.emails
 
 
 # Mailserver in config.yml (plus pw in conifg)
