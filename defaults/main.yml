@@ -37,13 +37,18 @@ sentry__packages: []
 
 sentry__version: '8.10.0'
 
-sentry__domain: 'sentry.test.de'
+sentry__fqdn: 'sentry.{{ sentry__domain }}'
+
+sentry__domain: '{{ ansible_domain if ansible_domain else ansible_hostname }}'
 
 sentry__pip_base_packages:
   - name: 'sentry'
     version: '{{ sentry__version }}'
 
 sentry__pip_packages: []
+
+sentry__user: 'sentry'
+sentry__group: 'sentry'
 
 sentry__database_user: 'sentry'
 sentry__database_name: 'sentry'
@@ -73,14 +78,12 @@ sentry__superusers:
 sentry__nginx_upstream:
   name: 'sentry'
   enabled: True
-  delete: False
   type: 'default'
   server: ['[::1]:9000']
 
 sentry__nginx_web_server:
   enabled: True
-  delete: False
-  name: ['{{ sentry__domain }}']
+  name: '{{ sentry__domain }}'
   welcome: False
   ssl: True
   acme: False

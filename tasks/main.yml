@@ -18,17 +18,16 @@
     - '{{ sentry__pip_base_packages }}'
     - '{{ sentry__pip_packages }}'
 
-- name: Make /etc/sentry
+- name: Make directories
   file:
-    path: /etc/sentry
+    path: '{{ item }}'
+    owner: '{{ sentry__user }}'
+    group: '{{ sentry__group }}'
+    mode: '0755'
     state: directory
-
-- name: Make /var/local/sentry
-  file:
-    path: /var/local/sentry
-    state: directory
-
-# ??? Manual step: 'sentry init /etc/sentry'
+  with_items:
+    - '/etc/sentry'
+    - '/var/local/sentry'
 
 - name: Copy the sentry.conf template
   template:
@@ -60,15 +59,18 @@
       dest: '/etc/systemd/system/sentry-cron.service'
   notify: Restart sentry services
 
-- name: Add group sentry
+- name: Add sentry group
   group:
-      name: 'sentry'
+      name: '{{ sentry__group }}'
       state: present
+      system: True
 
-- name: Add user sentry
+- name: Add sentry user
   user:
-      name: 'sentry'
-      group: 'sentry'
+      name: '{{ sentry__user }}'
+      group: '{{ sentry__group }}'
+      system: True
+      shell: '/usr/sbin/nologin'
 
 - name: Enable sentry services
   service:
