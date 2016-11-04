@@ -13,7 +13,16 @@ This role requires at least Ansible `v2.1.0`. To install it, run:
 ```Shell
     git clone https://github.com/starzel/
 ```
-Its not yet on Ansible Galaxy
+Its not yet on Ansible Galaxy. 
+
+
+
+### Role dependencies
+
+- `debops.secret`
+- `debops.secret`
+- `debops.secret`
+ 
 
 ### Documentation
 
