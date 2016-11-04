@@ -16,6 +16,11 @@ ansigenome_info:
       twitter: 'gomezr'
       github: 'gomez'
 
+    - name: 'Korbinian Preisler'
+      email: 'kpreisler@virtual-things.biz'
+      twitter: 'timitos'
+      github: 'timitos'
+
   synopsis: |
     [Sentry](https://sentry.io/) is a error logging server 
 
