@@ -25,6 +25,11 @@ ansigenome_info:
       email: 'bauer@starzel.de'
       twitter: 'Starzelde'
       github: 'pbauer'
+    
+    - name: 'Max Jakob'
+      email: 'max.jakob@ifi.lmu.de'
+      twitter: 'wolpi59'
+      github: 'vincero'
 
   synopsis: |
     [Sentry](https://sentry.io/) is a error logging server 
