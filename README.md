@@ -37,10 +37,10 @@ into your playbook.
 
 ### Authors and license
 
-- Max Jakob | [e-mail](mailto:<max.jakob@ifi.lmu.de>) | [Twitter](https://twitter.com/wolpi59) | [GitHub](https://github.com/vincero)
-- [Philip Bauer](http://starzel.de/) | [e-mail](mailto:<bauer@starzel.de>) | [Twitter](https://twitter.com/starzelde) | [GitHub](https://github.com/pbauer)
-- [Korbinian Preisler](http://virtual-things.biz/) | [e-mail](mailto:<max.jakob@ifi.lmu.de>) | [Twitter](https://twitter.com/timitos/) | [GitHub](https://github.com/timitos)
-- [Steffen Lindner](http://steffen-lindner.de/) | [e-mail](mailto:<mail@steffen-lindner.de>) | [Twitter](https://twitter.com/gomezr) | [GitHub](https://github.com/gomezr)
+- Max Jakob | [e-mail](mailto:max.jakob@ifi.lmu.de>) | [Twitter](https://twitter.com/wolpi59) | [GitHub](https://github.com/vincero)
+- [Philip Bauer](http://starzel.de/) | [e-mail](mailto:bauer@starzel.de) | [Twitter](https://twitter.com/starzelde) | [GitHub](https://github.com/pbauer)
+- [Korbinian Preisler](http://virtual-things.biz/) | [e-mail](mailto:kpreisler@virtual-things.biz) | [Twitter](https://twitter.com/timitos/) | [GitHub](https://github.com/timitos)
+- [Steffen Lindner](http://steffen-lindner.de/) | [e-mail](mailto:mail@steffen-lindner.de) | [Twitter](https://twitter.com/gomezr) | [GitHub](https://github.com/gomezr)
 
 License: [GPLv3](https://tldrlegal.com/license/gnu-general-public-license-v3-%28gpl-3%29)
 
