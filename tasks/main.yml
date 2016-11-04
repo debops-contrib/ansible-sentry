@@ -20,9 +20,9 @@
 
 - name: Make directories
   file:
-    path: {{ item }}
-    owner: {{ sentry__user }}
-    group: {{ sentry__group }}
+    path: '{{ item }}'
+    owner: '{{ sentry__user }}'
+    group: '{{ sentry__group }}'
     mode: '0755'
     state: directory
   with_items:
