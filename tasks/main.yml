@@ -1,0 +1,111 @@
+---
+
+- name: Install packages needed for sentry
+  apt:
+    name: '{{ item }}'
+    state: 'latest'
+    install_recommends: False
+  with_flattened:
+    - '{{ sentry__base_packages }}'
+    - '{{ sentry__packages }}'
+
+# Update with pip install script get-pip.py
+- name: Install Sentry with pip
+  pip:
+    name: '{{ item.name }}'
+    version: '{{ item.version }}'
+  with_flattened:
+    - '{{ sentry__pip_base_packages }}'
+    - '{{ sentry__pip_packages }}'
+
+- name: Make /etc/sentry
+  file:
+    path: /etc/sentry
+    state: directory
+
+- name: Make /var/local/sentry
+  file:
+    path: /var/local/sentry
+    state: directory
+
+# ??? Manual step: 'sentry init /etc/sentry'
+
+- name: Copy the sentry.conf template
+  template:
+      src: 'etc/sentry/sentry.conf.py.j2'
+      dest: '/etc/sentry/sentry.conf.py'
+  notify: Restart sentry services
+
+- name: Copy the config.yml template
+  template:
+      src: 'etc/sentry/config.yml.j2'
+      dest: '/etc/sentry/config.yml'
+  notify: Restart sentry services
+
+- name: Copy the sentry-web systemd conf
+  template:
+      src: 'etc/systemd/system/sentry-web.service.j2'
+      dest: '/etc/systemd/system/sentry-web.service'
+  notify: Restart sentry services
+
+- name: Copy the sentry-worker systemd conf
+  template:
+      src: 'etc/systemd/system/sentry-worker.service.j2'
+      dest: '/etc/systemd/system/sentry-worker.service'
+  notify: Restart sentry services
+
+- name: Copy the sentry-cron systemd conf
+  template:
+      src: 'etc/systemd/system/sentry-cron.service.j2'
+      dest: '/etc/systemd/system/sentry-cron.service'
+  notify: Restart sentry services
+
+- name: Add group sentry
+  group:
+      name: 'sentry'
+      state: present
+
+- name: Add user sentry
+  user:
+      name: 'sentry'
+      group: 'sentry'
+
+- name: Enable sentry services
+  service:
+      name: '{{ item }}'
+      enabled: yes
+      state: restarted
+  with_items:
+    - sentry-web
+    - sentry-worker
+    - sentry-cron
+  notify: Restart sentry services
+
+- name: Initialize or migrate database
+  command: /usr/local/bin/sentry --config /etc/sentry upgrade --noinput
+
+- name: Get email addresses of sentry users
+  sentryusers:
+    config: '/etc/sentry'
+  register: sentry_users
+
+# TODO: This is not idempotent yet!!!!
+- name: Create admin user
+  command: |
+    /usr/local/bin/sentry
+      --config /etc/sentry createuser
+      --email '{{ item.email }}'
+      --password '{{ item.password }}'
+      --superuser
+      --no-input
+  with_items: '{{ sentry__superusers }}'
+  when: item.email not in sentry_users.emails
+
+
+# Mailserver in config.yml (plus pw in conifg)
+
+# SystemD autstart script in templates
+
+# Redis bind to 127.0.1.1
+
+# Redis slave read only disable

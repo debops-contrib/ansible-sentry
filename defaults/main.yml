@@ -1,0 +1,75 @@
+---
+sentry__base_packages:
+  - python-setuptools
+  - python-pip
+  - python-virtualenv
+  - virtualenv  # Only on debian?
+  - python-dev
+  - libxslt1-dev
+  - gcc
+  - libffi-dev
+  - libjpeg-dev
+  - libxml2-dev
+  - libxslt-dev
+  - libyaml-dev
+  - postgresql-server-dev-9.4
+
+sentry__packages: []
+
+sentry__version: '8.8.0'
+
+sentry__domain: 'sentry.test.de'
+
+sentry__pip_base_packages:
+  - name: 'sentry'
+    version: '{{ sentry__version }}'
+
+sentry__pip_packages: []
+
+sentry__database_user: 'sentry'
+sentry__database_name: 'sentry'
+
+sentry__postgresql_user_role:
+  name: '{{ sentry__database_user }}'
+  flags:
+    - 'NOSUPERUSER'
+    - 'NOCREATEROLE'
+    - 'NOCREATEDB'
+    - 'NOINHERIT'
+    - 'NOREPLICATION'
+    - 'LOGIN'
+  db: '{{ sentry__database_name }}'
+
+sentry__postgresql_roles:
+  - '{{ sentry__postgresql_user_role }}'  # Password is not passed directly - it will be read from the file
+
+sentry__postgresql_database:
+  name: '{{ sentry__database_name }}'
+  owner: '{{ sentry__database_user }}'
+
+sentry__superusers:
+  - email: 'services@vth.systems'
+    password: 'admin'
+
+sentry__nginx_upstream:
+  name: 'sentry'
+  enabled: True
+  delete: False
+  type: 'default'
+  server: ['[::1]:9000']
+
+sentry__nginx_web_server:
+  enabled: True
+  delete: False
+  name: ['{{ sentry__domain }}']
+  welcome: False
+  ssl: True
+  acme: False
+  root: False
+  index: False
+  favicon: True
+  redirect_to_ssl: True
+  location:
+    '/': |
+      include     uwsgi_params;
+      uwsgi_pass  sentry;
