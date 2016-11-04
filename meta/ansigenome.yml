@@ -1,7 +1,8 @@
 ---
 
 ansigenome_info:
-  galaxy_url: ""
+
+  galaxy_url: 'https://galaxy.ansible.com/debops/sentry'
   github_url: "https://github.com/starzel/ansible-sentry"
   git_branch: "master"
 
