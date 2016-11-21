@@ -21,7 +21,7 @@ This role requires at least Ansible. To install it, run:
 
 Until the documentation is available in a rendered version you can refer to the
 reST documentation source files in the
-[/docs](https://github.com/debops-contrib/ansible-firejail/tree/master/docs) directory.
+[/docs](https://github.com/starzel/ansible-sentry/tree/master/docs) directory.
 
 
 ### Are you using this as a standalone role without DebOps?
