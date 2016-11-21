@@ -60,21 +60,23 @@
       dest: '/etc/systemd/system/sentry-worker.service'
     - src: 'etc/systemd/system/sentry-cron.service.j2'
       dest: '/etc/systemd/system/sentry-cron.service'
-  notify: Restart sentry services
+  notify:
+    - 'Reload systemd'
+    - 'Restart sentry services'
 
 - name: Enable sentry services
   service:
       name: '{{ item }}'
-      enabled: yes
-      state: restarted
+      enabled: 'yes'
+      state: 'started'
   with_items:
     - sentry-web
     - sentry-worker
     - sentry-cron
-  notify: Restart sentry services
+  notify: 'Restart sentry services'
 
 - name: Initialize or migrate database
-  command: '{{ sentry__virtualenv }}'/bin/sentry --config '{{ sentry__config }}' upgrade --noinput
+  command: '{{ sentry__virtualenv }}/bin/sentry --config {{ sentry__config }} upgrade --lock --noinput'
 
 # - name: Get email addresses of sentry users
 #   sentryusers:
