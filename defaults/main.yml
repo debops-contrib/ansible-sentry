@@ -1,4 +1,18 @@
 ---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# ansible.sentry default variables [[[
+# ====================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: includes/all.rst
+
+
+# .. envvar:: sentry__base_packages [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__base_packages:
   - 'python-setuptools'
   - 'python-pip'
@@ -15,16 +29,31 @@ sentry__base_packages:
         if (ansible_distribution_release in [ "wheezy", "precise" ])
         else "virtualenv" }}'
 
+                                                                   # ]]]
+# .. envvar:: sentry__packages [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__packages: []
 
+                                                                   # ]]]
+# .. envvar:: sentry__version [[[
+#
 # 8.10.0 will need cmake from stretch
 sentry__version: '8.8.0'
 
+                                                                   # ]]]
+# .. envvar:: sentry__domain [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__domain: '{{ ansible_domain if ansible_domain else ansible_hostname }}'
 
+                                                                   # ]]]
+# .. envvar:: sentry__fqdn [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__fqdn: '{{ "sentry." + sentry__domain }}'
 
-
+                                                                   # ]]]
 # Application user, group, home [[[
 # ---------------------------------
 
@@ -46,7 +75,6 @@ sentry__group: 'sentry'
 sentry__shell: '/usr/sbin/nologin'
                                                                    # ]]]
                                                                    # ]]]
-
 # Directory paths [[[
 # -------------------
 
@@ -68,8 +96,6 @@ sentry__lib: '{{ (ansible_local.root.lib
                   else "/usr/local/lib") + "/" + sentry__user }}'
                                                                    # ]]]
                                                                    # ]]]
-
-
 # Python virtualenv configuration [[[
 # -----------------------------------
 
@@ -96,10 +122,21 @@ sentry__virtualenv_pip_packages:
     version: '{{ sentry__version }}'
                                                                    # ]]]
                                                                    # ]]]
-
+# .. envvar:: sentry__database_user [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__database_user: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__database_name [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__database_name: 'sentry'
 
+                                                                   # ]]]
+# .. envvar:: sentry__postgresql_user_role [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__postgresql_user_role:
   name: '{{ sentry__database_user }}'
   flags:
@@ -111,22 +148,47 @@ sentry__postgresql_user_role:
     - 'LOGIN'
   db: '{{ sentry__database_name }}'
 
+                                                                   # ]]]
+# .. envvar:: sentry__postgresql_roles [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__postgresql_roles:
   - '{{ sentry__postgresql_user_role }}'  # Password is not passed directly - it will be read from the file
 
+                                                                   # ]]]
+# .. envvar:: sentry__postgresql_database [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__postgresql_database:
   name: '{{ sentry__database_name }}'
   owner: '{{ sentry__database_user }}'
 
+                                                                   # ]]]
+# .. envvar:: sentry__superusers [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__superusers: '{{ lookup("template", "lookup/sentry__config_admins.j2") | from_yaml }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__superuser_password_length [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__superuser_password_length: '32'
 
+                                                                   # ]]]
+# .. envvar:: sentry__nginx_upstream [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__nginx_upstream:
   name: 'sentry'
   enabled: True
   type: 'default'
   server: ['[::1]:9000']
 
+                                                                   # ]]]
+# .. envvar:: sentry__nginx_web_server [[[
+#
+# FIXME(yaml4rst): Describe what this variable is doing.
 sentry__nginx_web_server:
   enabled: True
   name: '{{ sentry__domain }}'
@@ -141,3 +203,6 @@ sentry__nginx_web_server:
     '/': |
       include     uwsgi_params;
       uwsgi_pass  sentry;
+
+# ]]]
+# ]]]
