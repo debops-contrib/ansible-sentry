@@ -1,0 +1,11 @@
+#! {{ sentry__virtualenv }}/bin/python
+# -*- coding: utf-8 -*-
+"""Get email-addresses of all sentry users"""
+import os
+from sentry.utils.runner import configure
+
+os.environ['SENTRY_CONF'] = '{{ sentry__config }}'
+configure()
+from sentry.models import User  # noqa
+response = [x.email for x in User.objects.all()]
+print(response)

@@ -76,12 +76,17 @@
   notify: 'Restart sentry services'
 
 - name: Initialize or migrate database
-  command: '{{ sentry__virtualenv }}/bin/sentry --config {{ sentry__config }} upgrade --lock --noinput'
+  command: '{{ sentry__virtualenv + "/bin/sentry --config " + sentry__config + " upgrade --noinput"}}'
 
-# - name: Get email addresses of sentry users
-#   sentryusers:
-#     config: '{{ sentry__config }}'
-#   register: sentry_users
+- name: Copy superusers script
+  template:
+    src: 'usr/local/lib/sentry/sentryusers.j2'
+    dest: '{{ sentry__lib }}/sentryusers'
+    mode: '0755'
+
+- name: Get email addresses of sentry users
+  command: '{{ sentry__lib }}/sentryusers'
+  register: sentry_users
 
 # TODO: This is not idempotent yet!!!!
 - name: Create admin user
@@ -93,7 +98,7 @@
       --superuser
       --no-input
   with_items: '{{ sentry__superusers }}'
-  when: item not in sentry_users.emails
+  when: item not in sentry_users.stdout
 
 - name: Configure periodical cleanup
   cron:
