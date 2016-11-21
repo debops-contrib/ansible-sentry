@@ -18,7 +18,7 @@
         - '{{ sentry__nginx_web_server }}'
 
     - role: debops.postgresql
-      tags: [ 'role::sentry', 'depend::postgresql', 'depend::postgresql:sentry', 'depend-of::sentry', 'type::dependency' ]
+      tags: [ 'depend::postgresql', 'depend::postgresql:sentry', 'depend-of::sentry', 'type::dependency' ]
       postgresql__roles: '{{ sentry__postgresql_roles }}'
       postgresql__databases:
         - '{{ sentry__postgresql_database }}'
