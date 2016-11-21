@@ -1,22 +1,12 @@
 ---
 
-- name: Install packages needed for sentry
+- name: Install required packages
   apt:
     name: '{{ item }}'
-    state: 'latest'
-    install_recommends: False
+    state: 'present'
   with_flattened:
     - '{{ sentry__base_packages }}'
     - '{{ sentry__packages }}'
-
-# Update with pip install script get-pip.py
-- name: Install Sentry with pip
-  pip:
-    name: '{{ item.name }}'
-    version: '{{ item.version }}'
-  with_flattened:
-    - '{{ sentry__pip_base_packages }}'
-    - '{{ sentry__pip_packages }}'
 
 - name: Add sentry group
   group:
@@ -24,23 +14,36 @@
       state: present
       system: True
 
-- name: Add sentry user
+- name: Create sentry system user
   user:
-      name: '{{ sentry__user }}'
-      group: '{{ sentry__group }}'
-      system: True
-      shell: '/usr/sbin/nologin'
+    name: '{{ sentry__user }}'
+    group: '{{ sentry__group }}'
+    home: '{{ sentry__home }}'
+    shell: '{{ sentry__shell }}'
+    state: 'present'
+    system: True
 
-- name: Make directories
+- name: Create directories
   file:
     path: '{{ item }}'
+    state: 'directory'
     owner: '{{ sentry__user }}'
     group: '{{ sentry__group }}'
     mode: '0755'
-    state: directory
   with_items:
+    - '{{ sentry__lib }}'
     - '/etc/sentry'
-    - '/var/local/sentry'
+
+- name: Install sentry in a virtualenv
+  pip:
+    name:       '{{ item.name | d(item) }}'
+    version:    '{{ item.version | d(omit) }}'
+    virtualenv: '{{ sentry__virtualenv }}'
+  become_user: '{{ sentry__user }}'
+  with_flattened: '{{ sentry__virtualenv_pip_packages }}'
+  register: sentry__register_virtualenv
+  changed_when: (sentry__register_virtualenv|success and
+                 sentry__register_virtualenv.stdout|search('New python executable in'))
 
 - name: Copy the sentry.conf template
   template:
@@ -86,10 +89,10 @@
 - name: Initialize or migrate database
   command: /usr/local/bin/sentry --config /etc/sentry upgrade --noinput
 
-- name: Get email addresses of sentry users
-  sentryusers:
-    config: '/etc/sentry'
-  register: sentry_users
+# - name: Get email addresses of sentry users
+#   sentryusers:
+#     config: '/etc/sentry'
+#   register: sentry_users
 
 # TODO: This is not idempotent yet!!!!
 - name: Create admin user

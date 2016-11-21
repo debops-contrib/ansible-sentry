@@ -2,8 +2,6 @@
 sentry__base_packages:
   - 'python-setuptools'
   - 'python-pip'
-  - 'python-virtualenv'
-  - 'virtualenv'  # Only on debian?
   - 'python-dev'
   - 'libxslt1-dev'
   - 'gcc'
@@ -12,24 +10,92 @@ sentry__base_packages:
   - 'libxml2-dev'
   - 'libxslt-dev'
   - 'libyaml-dev'
-  - 'postgresql-server-dev-9.4'
+  - 'libpq-dev'
+  - '{{ "python-virtualenv"
+        if (ansible_distribution_release in [ "wheezy", "precise" ])
+        else "virtualenv" }}'
 
 sentry__packages: []
 
+# 8.10.0 will need cmake from stretch
 sentry__version: '8.8.0'
-
-sentry__fqdn: 'sentry.{{ sentry__domain }}'
 
 sentry__domain: '{{ ansible_domain if ansible_domain else ansible_hostname }}'
 
-sentry__pip_base_packages:
+sentry__fqdn: '{{ "sentry." + sentry__domain }}'
+
+
+# Application user, group, home [[[
+# ---------------------------------
+
+# .. envvar:: sentry__user [[[
+#
+# Name of the UNIX system account used to manage sentry.
+sentry__user: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__group [[[
+#
+# Name of the UNIX primary group used to manage sentry.
+sentry__group: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__shell [[[
+#
+# The default shell set on the sentry account.
+sentry__shell: '/usr/sbin/nologin'
+                                                                   # ]]]
+                                                                   # ]]]
+
+# Directory paths [[[
+# -------------------
+
+# .. envvar:: sentry__home [[[
+#
+# The sentry account home directory.
+sentry__home: '{{ (ansible_local.root.home
+                   if (ansible_local|d() and ansible_local.root|d() and
+                       ansible_local.root.home|d())
+                   else "/var/local") + "/" + sentry__user }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__lib [[[
+#
+# Directory where the sentry application directory is located.
+sentry__lib: '{{ (ansible_local.root.lib
+                  if (ansible_local|d() and ansible_local.root|d() and
+                      ansible_local.root.lib|d())
+                  else "/usr/local/lib") + "/" + sentry__user }}'
+                                                                   # ]]]
+                                                                   # ]]]
+
+
+# Python virtualenv configuration [[[
+# -----------------------------------
+
+# .. envvar:: sentry__virtualenv [[[
+#
+# Path where the sentry ``virtualenv`` directory will be stored.
+sentry__virtualenv: '{{ sentry__lib + "/virtualenv" }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__virtualenv_env_path [[[
+#
+# The contents of the ``$PATH`` environment variable set for the Ansible tasks
+# which are executed inside of the sentry Python environment.
+sentry__virtualenv_env_path: '{{ sentry__virtualenv }}/bin:/usr/local/bin:/usr/bin:/bin'
+
+                                                                   # ]]]
+# .. envvar:: sentry__virtualenv_pip_packages [[[
+#
+# List of additional Python modules installed inside of the sentry
+# ``virtualenv`` environment. See :ref:`sentry__ref_virtualenv_pip_packages`
+# for more details.
+sentry__virtualenv_pip_packages:
   - name: 'sentry'
     version: '{{ sentry__version }}'
-
-sentry__pip_packages: []
-
-sentry__user: 'sentry'
-sentry__group: 'sentry'
+                                                                   # ]]]
+                                                                   # ]]]
 
 sentry__database_user: 'sentry'
 sentry__database_name: 'sentry'

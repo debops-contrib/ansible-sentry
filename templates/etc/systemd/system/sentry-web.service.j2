@@ -7,11 +7,11 @@ Requires=sentry-cron.service
 
 [Service]
 Type=simple
-User=sentry
-Group=sentry
-WorkingDirectory=/var/local/sentry
+User={{ sentry__user }}
+Group={{ sentry__group }}
+WorkingDirectory={{ sentry__home }}
 Environment=SENTRY_CONF=/etc/sentry
-ExecStart=/usr/local/bin/sentry run web
+ExecStart={{ sentry__virtualenv }}/bin/sentry run web
 
 [Install]
 WantedBy=multi-user.target

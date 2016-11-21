@@ -5,11 +5,11 @@ After=network.target
 
 [Service]
 Type=simple
-User=sentry
-Group=sentry
-WorkingDirectory=/var/local/sentry
+User={{ sentry__user }}
+Group={{ sentry__group }}
+WorkingDirectory={{ sentry__home }}
 Environment=SENTRY_CONF=/etc/sentry
-ExecStart=/usr/local/bin/sentry run cron
+ExecStart={{ sentry__virtualenv }}/bin/sentry run cron
 
 [Install]
 WantedBy=multi-user.target
