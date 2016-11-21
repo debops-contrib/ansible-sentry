@@ -215,7 +215,7 @@ sentry__nginx_upstream:
 # Nginx vhost configuration
 sentry__nginx_web_server:
   enabled: True
-  name: '{{ sentry__domain }}'
+  name: '{{ sentry__fqdn }}'
   welcome: False
   ssl: True
   acme: False
