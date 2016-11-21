@@ -12,7 +12,7 @@
 
 # .. envvar:: sentry__base_packages [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# List of base packages to install.
 sentry__base_packages:
   - 'python-setuptools'
   - 'python-pip'
@@ -32,25 +32,25 @@ sentry__base_packages:
                                                                    # ]]]
 # .. envvar:: sentry__packages [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# List of additional packages to install.
 sentry__packages: []
 
                                                                    # ]]]
 # .. envvar:: sentry__version [[[
 #
-# 8.10.0 will need cmake from stretch
+# The version of sentry that will be used. sentry 8.10.0 needs cmake from stretch.
 sentry__version: '8.8.0'
 
                                                                    # ]]]
 # .. envvar:: sentry__domain [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# The default domain used in different places of the role.
 sentry__domain: '{{ ansible_domain if ansible_domain else ansible_hostname }}'
 
                                                                    # ]]]
 # .. envvar:: sentry__fqdn [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# The Fully Qualified Domain Name of Sentry.
 sentry__fqdn: '{{ "sentry." + sentry__domain }}'
 
                                                                    # ]]]
@@ -130,13 +130,13 @@ sentry__virtualenv_pip_packages:
                                                                    # ]]]
 # .. envvar:: sentry__database_user [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# Name of the PostgreSQL user used by sentry.
 sentry__database_user: 'sentry'
 
                                                                    # ]]]
 # .. envvar:: sentry__database_name [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# # Name of the PostgreSQL database used by sentry.
 sentry__database_name: 'sentry'
 
                                                                    # ]]]
@@ -164,7 +164,7 @@ sentry__postgresql_roles:
                                                                    # ]]]
 # .. envvar:: sentry__postgresql_database [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# The postgresql database name and owner used by sentry
 sentry__postgresql_database:
   name: '{{ sentry__database_name }}'
   owner: '{{ sentry__database_user }}'
