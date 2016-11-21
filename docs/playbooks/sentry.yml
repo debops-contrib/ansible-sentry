@@ -10,14 +10,6 @@
 
   roles:
 
-    - role: debops.apt_preferences
-      tags: [ 'role::apt_preferences' ]
-      apt_preferences__dependent_list: '{{ sentry__apt_preferences__list }}'
-
-    - role: debops.apt
-      tags: [ 'role::apt' ]
-      apt__sources: '{{ sentry__apt__sources }}'
-
     - role: debops.nginx
       tags: [ 'role::nginx' ]
       nginx_upstreams:
