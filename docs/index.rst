@@ -8,7 +8,6 @@ Ansible role: debops-contrib.sentry
 
    introduction
    getting-started
-   defaults
    defaults-detailed
    copyright
    changelog

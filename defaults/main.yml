@@ -94,6 +94,7 @@ sentry__lib: '{{ (ansible_local.root.lib
                   if (ansible_local|d() and ansible_local.root|d() and
                       ansible_local.root.lib|d())
                   else "/usr/local/lib") + "/" + sentry__user }}'
+
                                                                    # ]]]
 # .. envvar:: sentry__config [[[
 #
@@ -101,7 +102,6 @@ sentry__lib: '{{ (ansible_local.root.lib
 sentry__config: '/etc/sentry'
                                                                    # ]]]
                                                                    # ]]]
-
 # Python virtualenv configuration [[[
 # -----------------------------------
 
@@ -142,7 +142,7 @@ sentry__database_name: 'sentry'
                                                                    # ]]]
 # .. envvar:: sentry__postgresql_user_role [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# Configure settings of the postgresql role
 sentry__postgresql_user_role:
   name: '{{ sentry__database_user }}'
   flags:
@@ -157,7 +157,7 @@ sentry__postgresql_user_role:
                                                                    # ]]]
 # .. envvar:: sentry__postgresql_roles [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# FIXME: Describe what this variable is doing.
 sentry__postgresql_roles:
   - '{{ sentry__postgresql_user_role }}'  # Password is not passed directly - it will be read from the file
 
@@ -172,19 +172,19 @@ sentry__postgresql_database:
                                                                    # ]]]
 # .. envvar:: sentry__superusers [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# Name of the sentry superuser
 sentry__superusers: '{{ lookup("template", "lookup/sentry__config_admins.j2") | from_yaml }}'
 
                                                                    # ]]]
 # .. envvar:: sentry__superuser_password_length [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# Length of the superuser password
 sentry__superuser_password_length: '32'
 
                                                                    # ]]]
 # .. envvar:: sentry__nginx_upstream [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# Nginx upstream configuration
 sentry__nginx_upstream:
   name: 'sentry'
   enabled: True
@@ -194,7 +194,7 @@ sentry__nginx_upstream:
                                                                    # ]]]
 # .. envvar:: sentry__nginx_web_server [[[
 #
-# FIXME(yaml4rst): Describe what this variable is doing.
+# Nginx vhost configuration
 sentry__nginx_web_server:
   enabled: True
   name: '{{ sentry__domain }}'
