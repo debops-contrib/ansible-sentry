@@ -8,11 +8,6 @@ other error metadata from several apps in varias programming languages
 
 This Ansible role allows you to setup, update and configure Sentry.
 
-Features
-~~~~~~~~
-
-
-
 Installation
 ~~~~~~~~~~~~
 
