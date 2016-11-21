@@ -45,33 +45,20 @@
   changed_when: (sentry__register_virtualenv|success and
                  sentry__register_virtualenv.stdout|search('New python executable in'))
 
-- name: Copy the sentry.conf template
+- name: Copy config files
   template:
-      src: 'etc/sentry/sentry.conf.py.j2'
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+  with_items:
+    - src: 'etc/sentry/sentry.conf.py.j2'
       dest: '/etc/sentry/sentry.conf.py'
-  notify: Restart sentry services
-
-- name: Copy the config.yml template
-  template:
-      src: 'etc/sentry/config.yml.j2'
+    - src: 'etc/sentry/config.yml.j2'
       dest: '/etc/sentry/config.yml'
-  notify: Restart sentry services
-
-- name: Copy the sentry-web systemd conf
-  template:
-      src: 'etc/systemd/system/sentry-web.service.j2'
+    - src: 'etc/systemd/system/sentry-web.service.j2'
       dest: '/etc/systemd/system/sentry-web.service'
-  notify: Restart sentry services
-
-- name: Copy the sentry-worker systemd conf
-  template:
-      src: 'etc/systemd/system/sentry-worker.service.j2'
+    - src: 'etc/systemd/system/sentry-worker.service.j2'
       dest: '/etc/systemd/system/sentry-worker.service'
-  notify: Restart sentry services
-
-- name: Copy the sentry-cron systemd conf
-  template:
-      src: 'etc/systemd/system/sentry-cron.service.j2'
+    - src: 'etc/systemd/system/sentry-cron.service.j2'
       dest: '/etc/systemd/system/sentry-cron.service'
   notify: Restart sentry services
 
