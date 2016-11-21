@@ -74,7 +74,7 @@
   notify: Restart sentry services
 
 - name: Initialize or migrate database
-  command: '{{ sentry__home }}'/bin/sentry --config '{{ sentry__config }}' upgrade --noinput
+  command: '{{ sentry__virtualenv }}'/bin/sentry --config '{{ sentry__config }}' upgrade --noinput
 
 # - name: Get email addresses of sentry users
 #   sentryusers:
@@ -84,7 +84,7 @@
 # TODO: This is not idempotent yet!!!!
 - name: Create admin user
   command: |
-    '{{ sentry__home }}'/bin/sentry
+    '{{ sentry__virtualenv }}'/bin/sentry
       --config '{{ sentry__config }}' createuser
       --email '{{ item }}'
       --password '{{ lookup("password", secret + "/credentials/" + ansible_fqdn + "/sentry/" + item + "/password length=" + sentry__superuser_password_length) }}'
