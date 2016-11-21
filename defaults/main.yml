@@ -54,6 +54,24 @@ sentry__domain: '{{ ansible_domain if ansible_domain else ansible_hostname }}'
 sentry__fqdn: '{{ "sentry." + sentry__domain }}'
 
                                                                    # ]]]
+
+# Cleanup settings [[[
+# ---------------------------------
+
+# .. envvar:: sentry__cleanup_frequency [[[
+#
+# Cleanup frequency (daily, weekly, monthly)
+sentry__cleanup_frequency: 'weekly'
+
+                                                                   # ]]]
+# .. envvar:: sentry__cleanup_keep_days [[[
+#
+# Number of days for which to keep records during cleanup.
+sentry__cleanup_keep_days: '180'
+
+                                                                   # ]]]
+                                                                   # ]]]
+
 # Application user, group, home [[[
 # ---------------------------------
 

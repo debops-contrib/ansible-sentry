@@ -93,6 +93,14 @@
   with_items: '{{ sentry__superusers }}'
   when: item not in sentry_users.emails
 
+- name: Configure periodical cleanup
+  cron:
+    name: 'Remove old sentry data'
+    special_time: '{{ sentry__cleanup_frequency }}'
+    state: 'present'
+    user: '{{ sentry__user }}'
+    job: '. {{ sentry__virtualenv }}/bin/sentry cleanup --days={{ sentry__cleanup_keep_days }}'
+  cron_file: 'sentry-cleanup'
 
 # Mailserver in config.yml (plus pw in conifg)
 
