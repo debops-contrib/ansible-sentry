@@ -12,9 +12,9 @@
 
     - role: debops.nginx
       tags: [ 'role::nginx' ]
-      nginx_upstreams:
+      nginx__upstreams:
         - '{{ sentry__nginx_upstream }}'
-      nginx_servers:
+      nginx__servers:
         - '{{ sentry__nginx_web_server }}'
 
     - role: debops.postgresql
