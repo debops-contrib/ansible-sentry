@@ -102,7 +102,7 @@
     state: 'present'
     user: '{{ sentry__user }}'
     job: '. {{ sentry__virtualenv }}/bin/sentry cleanup --days={{ sentry__cleanup_keep_days }}'
-  cron_file: 'sentry-cleanup'
+    cron_file: 'sentry-cleanup'
 
 # Mailserver in config.yml (plus pw in conifg)
 
