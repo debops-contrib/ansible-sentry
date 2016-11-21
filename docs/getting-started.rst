@@ -18,7 +18,7 @@ To setup and configure Sentry (version 8.8.0) on a given host it should be inclu
    [debops_service_sentry]
    hostname
 
-Additional more services are needed on the same machine or remote:
+Additionaly a database and a message-queue are needed on the same machine or remote:
 
 .. code:: ini
 

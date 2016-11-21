@@ -32,7 +32,7 @@
     mode: '0755'
   with_items:
     - '{{ sentry__lib }}'
-    - '/etc/sentry'
+    - '{{ sentry__config }}'
 
 - name: Install sentry in a virtualenv
   pip:
@@ -51,9 +51,9 @@
       dest: '{{ item.dest }}'
   with_items:
     - src: 'etc/sentry/sentry.conf.py.j2'
-      dest: '/etc/sentry/sentry.conf.py'
+      dest: '{{ sentry__config }}/sentry.conf.py'
     - src: 'etc/sentry/config.yml.j2'
-      dest: '/etc/sentry/config.yml'
+      dest: '{{ sentry__config }}/config.yml'
     - src: 'etc/systemd/system/sentry-web.service.j2'
       dest: '/etc/systemd/system/sentry-web.service'
     - src: 'etc/systemd/system/sentry-worker.service.j2'
@@ -74,18 +74,18 @@
   notify: Restart sentry services
 
 - name: Initialize or migrate database
-  command: /usr/local/bin/sentry --config /etc/sentry upgrade --noinput
+  command: '{{ sentry__home }}'/bin/sentry --config '{{ sentry__config }}' upgrade --noinput
 
 # - name: Get email addresses of sentry users
 #   sentryusers:
-#     config: '/etc/sentry'
+#     config: '{{ sentry__config }}'
 #   register: sentry_users
 
 # TODO: This is not idempotent yet!!!!
 - name: Create admin user
   command: |
-    /usr/local/bin/sentry
-      --config /etc/sentry createuser
+    '{{ sentry__home }}'/bin/sentry
+      --config '{{ sentry__config }}' createuser
       --email '{{ item }}'
       --password '{{ lookup("password", secret + "/credentials/" + ansible_fqdn + "/sentry/" + item + "/password length=" + sentry__superuser_password_length) }}'
       --superuser

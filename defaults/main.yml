@@ -95,7 +95,13 @@ sentry__lib: '{{ (ansible_local.root.lib
                       ansible_local.root.lib|d())
                   else "/usr/local/lib") + "/" + sentry__user }}'
                                                                    # ]]]
+# .. envvar:: sentry__config [[[
+#
+# Directory where the sentry config files are located.
+sentry__config: '/etc/sentry'
                                                                    # ]]]
+                                                                   # ]]]
+
 # Python virtualenv configuration [[[
 # -----------------------------------
 
