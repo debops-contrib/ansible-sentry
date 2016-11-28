@@ -146,6 +146,33 @@ sentry__virtualenv_pip_packages:
     version: '{{ sentry__version }}'
                                                                    # ]]]
                                                                    # ]]]
+
+# Sentry configuration [[[
+# -----------------------------------
+
+# .. envvar:: sentry__superusers [[[
+#
+# Name of the sentry superuser
+sentry__superusers: '{{ lookup("template", "lookup/sentry__config_admins.j2") | from_yaml }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__superuser_password_length [[[
+#
+# Length of the superuser password
+sentry__superuser_password_length: '32'
+                                                                   # ]]]
+# .. envvar:: sentry__config_secret_key [[[
+#
+# The Django secret key used by the sentry application. It will be shared by
+# all hosts on the same domain.
+sentry__config_secret_key: '{{ lookup("password", secret + "/sentry/" +
+                               sentry__domain + "/config/secret_key length=64") }}'
+                                                                   # ]]]
+                                                                   # ]]]
+
+# Postgresql configuration [[[
+# -----------------------------------
+
 # .. envvar:: sentry__database_user [[[
 #
 # Name of the PostgreSQL user used by sentry.
@@ -187,24 +214,10 @@ sentry__postgresql_database:
   name: '{{ sentry__database_name }}'
   owner: '{{ sentry__database_user }}'
                                                                    # ]]]
-# .. envvar:: sentry__superusers [[[
-#
-# Name of the sentry superuser
-sentry__superusers: '{{ lookup("template", "lookup/sentry__config_admins.j2") | from_yaml }}'
+                                                                   # ]]]
 
-                                                                   # ]]]
-# .. envvar:: sentry__superuser_password_length [[[
-#
-# Length of the superuser password
-sentry__superuser_password_length: '32'
-                                                                   # ]]]
-# .. envvar:: sentry__config_secret_key [[[
-#
-# The Django secret key used by the sentry application. It will be shared by
-# all hosts on the same domain.
-sentry__config_secret_key: '{{ lookup("password", secret + "/sentry/" +
-                               sentry__domain + "/config/secret_key length=64") }}'
-                                                                   # ]]]
+# NGINX configuration [[[
+# -----------------------------------
 
 # .. envvar:: sentry__nginx_upstream [[[
 #

@@ -88,7 +88,6 @@
   command: '{{ sentry__lib }}/sentryusers'
   register: sentry_users
 
-# TODO: This is not idempotent yet!!!!
 - name: Create admin user
   command: |
     '{{ sentry__virtualenv }}'/bin/sentry
