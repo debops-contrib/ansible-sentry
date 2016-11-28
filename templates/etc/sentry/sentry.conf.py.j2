@@ -38,8 +38,8 @@ SENTRY_USE_BIG_INTS = True
 
 # Instruct Sentry that this install intends to be run by a single organization
 # and thus various UI optimizations should be enabled.
-SENTRY_SINGLE_ORGANIZATION = True
-DEBUG = False
+SENTRY_SINGLE_ORGANIZATION = {{ sentry__config_sentry_single_organization | d(True) | bool }}
+DEBUG = {{ sentry__config_debug | d(False) | bool }}
 
 #########
 # Cache #
@@ -128,9 +128,11 @@ SENTRY_DIGESTS = 'sentry.digests.backends.redis.RedisBackend'
 # Any Django storage backend is compatible with Sentry. For more solutions see
 # the django-storages package: https://django-storages.readthedocs.io/en/latest/
 
-SENTRY_FILESTORE = 'django.core.files.storage.FileSystemStorage'
+SENTRY_FILESTORE = '{{ sentry__config_sentry_filestore }}'
 SENTRY_FILESTORE_OPTIONS = {
-    'location': '/tmp/sentry-files',
+{% for key in sentry__config_sentry_filestore_options.keys() %}
+    '{{ key }}': '{{ sentry__config_sentry_filestore_options[key] }}',
+{% endfor %}
 }
 
 ##############
@@ -147,9 +149,10 @@ SENTRY_FILESTORE_OPTIONS = {
 # you need to uncomment and set it to the path where Sentry is hosted.
 # FORCE_SCRIPT_NAME = '/sentry'
 
-SENTRY_WEB_HOST = '[::]'
-SENTRY_WEB_PORT = 9000
+SENTRY_WEB_HOST = '{{ sentry__config_sentry_web_host }}'
+SENTRY_WEB_PORT = '{{ sentry__config_sentry_web_port }}'
 SENTRY_WEB_OPTIONS = {
-    # 'workers': 3,  # the number of web workers
-    'protocol': 'uwsgi',  # Enable uwsgi protocol instead of http
+{% for key in sentry__config_sentry_web_options.keys() %}
+    '{{ key }}': '{{ sentry__config_sentry_web_options[key] }}',
+{% endfor %}
 }

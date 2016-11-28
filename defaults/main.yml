@@ -21,9 +21,11 @@ sentry__base_packages:
   - 'gcc'
   - 'libffi-dev'
   - 'libjpeg-dev'
+  - 'libssl-dev'
   - 'libxml2-dev'
   - 'libxslt-dev'
   - 'libyaml-dev'
+  - 'zlib1g-dev'
   - 'libpq-dev'
   - '{{ "python-virtualenv"
         if (ansible_distribution_release in [ "wheezy", "precise" ])
@@ -168,6 +170,47 @@ sentry__superuser_password_length: '32'
 sentry__config_secret_key: '{{ lookup("password", secret + "/sentry/" +
                                sentry__domain + "/config/secret_key length=64") }}'
                                                                    # ]]]
+
+# .. envvar:: sentry__config_sentry_single_organization [[[
+#
+# Instruct Sentry that this install intends to be run by a single organization
+# and thus various UI optimizations should be enabled.
+sentry__config_sentry_single_organization: True
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_filestore [[[
+#
+# Any Django storage backend is compatible with Sentry. For more solutions see
+# the django-storages package: https://django-storages.readthedocs.io/en/latest/
+sentry__config_sentry_filestore: 'django.core.files.storage.FileSystemStorage'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_host [[[
+#
+# Each Django storage backend has its own settings.
+sentry__config_sentry_filestore_options:
+  location: '{{ sentry__home + "/sentry-files" }}'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_host [[[
+#
+# Sentry web host
+sentry__config_sentry_web_host: '[::1]'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_port [[[
+#
+# Sentry web port
+sentry__config_sentry_web_port: 9000
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_options [[[
+#
+# Sentry web options
+sentry__config_sentry_web_options:
+  workers: 3          # the number of web workers
+  protocol: 'uwsgi'   # Enable uwsgi protocol instead of http
+                                                                   # ]]]
                                                                    # ]]]
 
 # Postgresql configuration [[[
@@ -226,7 +269,7 @@ sentry__nginx_upstream:
   name: 'sentry'
   enabled: True
   type: 'default'
-  server: ['[::1]:9000']
+  server: ['{{ sentry__config_sentry_web_host + ":" + sentry__config_sentry_web_port | string }}']
 
                                                                    # ]]]
 # .. envvar:: sentry__nginx_web_server [[[
