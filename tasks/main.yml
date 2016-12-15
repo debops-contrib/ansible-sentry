@@ -1,5 +1,4 @@
 ---
-
 - name: Install required packages
   apt:
     name: '{{ item }}'
@@ -49,26 +48,43 @@
   template:
       src: '{{ item.src }}'
       dest: '{{ item.dest }}'
+      owner: '{{ sentry__user }}'
+      group: '{{ sentry__group }}'
+      mode: '0640'
   with_items:
     - src: 'etc/sentry/sentry.conf.py.j2'
       dest: '{{ sentry__config }}/sentry.conf.py'
     - src: 'etc/sentry/config.yml.j2'
       dest: '{{ sentry__config }}/config.yml'
+  notify: 'Restart sentry services'
+
+- name: Generate systemd service unit
+  template:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      owner: 'root'
+      group: 'root'
+      mode: '0644'
+  with_items:
     - src: 'etc/systemd/system/sentry-web.service.j2'
       dest: '/etc/systemd/system/sentry-web.service'
     - src: 'etc/systemd/system/sentry-worker.service.j2'
       dest: '/etc/systemd/system/sentry-worker.service'
     - src: 'etc/systemd/system/sentry-cron.service.j2'
       dest: '/etc/systemd/system/sentry-cron.service'
-  notify:
-    - 'Reload systemd'
-    - 'Restart sentry services'
+  register: netbox__register_systemd
+  notify: 'Restart sentry services'
+
+- name: Reload systemd configuration
+  command: systemctl daemon-reload
+  when: (ansible_service_mgr == 'systemd' and
+         netbox__register_systemd|changed)
 
 - name: Enable sentry services
   service:
       name: '{{ item }}'
-      enabled: 'yes'
       state: 'started'
+      enabled: True
   with_items:
     - sentry-web
     - sentry-worker
