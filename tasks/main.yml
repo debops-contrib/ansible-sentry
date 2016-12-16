@@ -98,7 +98,9 @@
   template:
     src: 'usr/local/lib/sentry/sentryusers.j2'
     dest: '{{ sentry__lib }}/sentryusers'
-    mode: '0755'
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
 
 - name: Get email addresses of sentry users
   command: '{{ sentry__lib }}/sentryusers'

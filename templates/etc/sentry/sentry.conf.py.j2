@@ -18,8 +18,8 @@ DATABASES = {
             "/" + (sentry__postgresql_user_role.port | d(postgresql__port)) +
             "/credentials/" + sentry__postgresql_user_role.name | d(sentry__postgresql_user_role.role) + "/password " +
             "length=" + postgresql__password_length)) }}',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST': '{{ sentry__database_host }}',
+        'PORT': '{{ sentry__database_port }}',
         'AUTOCOMMIT': True,
         'ATOMIC_REQUESTS': False,
     }
@@ -141,9 +141,9 @@ SENTRY_FILESTORE_OPTIONS = {
 
 # If you're using a reverse SSL proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = '{{ sentry__config_secure_proxy_ssl_header }}'
+SESSION_COOKIE_SECURE = '{{ sentry__config_session_cookie_secure | bool }}'
+CSRF_COOKIE_SECURE = '{{ sentry__config_csrf_cookie_secure | bool }}'
 
 # If you're not hosting at the root of your web server,
 # you need to uncomment and set it to the path where Sentry is hosted.

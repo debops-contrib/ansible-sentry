@@ -204,17 +204,74 @@ sentry__config_sentry_web_host: '[::1]'
 sentry__config_sentry_web_port: 9000
                                                                    # ]]]
 
+# .. envvar:: sentry__config_sentry_web_socket [[[
+#
+# Will be preferred over a http socket otherwise set to False
+sentry__config_sentry_web_unix_socket: '/tmp/sentry.sock'
+                                                                   # ]]]
+
 # .. envvar:: sentry__config_sentry_web_options [[[
 #
 # Sentry web options
 sentry__config_sentry_web_options:
   workers: 3          # the number of web workers
   protocol: 'uwsgi'   # Enable uwsgi protocol instead of http
+  uwsgi-socket: '{{ sentry__config_sentry_web_unix_socket
+      if sentry__config_sentry_web_unix_socket
+      else sentry__config_sentry_web_host + ":" +
+      sentry__config_sentry_web_port | string }}'
+  chmod-socket: '660'
+  chown-socket: '{{ sentry__user }}:www-data'
+  uid: '{{ sentry__user }}'
+  gid: 'www-data'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_secure_proxy_ssl_header [[[
+#
+# If you're using a reverse SSL proxy, you should enable the
+# X-Forwarded-Proto header
+sentry__config_secure_proxy_ssl_header: '("HTTP_X_FORWARDED_PROTO", "https")'
+
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_session_cookie_secure [[[
+#
+# If you're using a reverse SSL proxy, you should enable this setting
+sentry__config_session_cookie_secure: True
+
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_csrf_cookie_secure [[[
+#
+# If you're using a reverse SSL proxy, you should enable this setting
+sentry__config_csrf_cookie_secure: True
+
                                                                    # ]]]
                                                                    # ]]]
 
 # Postgresql configuration [[[
 # -----------------------------------
+
+# .. envvar:: sentry__database_host [[[
+#
+# The hostname or IP address of the PostgreSQL database server
+# which should be used for the sentry database.
+sentry__database_host: '{{ ansible_local.postgresql.server
+                           if (ansible_local|d() and ansible_local.postgresql|d() and
+                               ansible_local.postgresql.server|d())
+                           else "localhost" }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__database_port [[[
+#
+# The TCP port of the PostgreSQL database server which should be
+# used for the sentry database.
+sentry__database_port: '{{ ansible_local.postgresql.port
+                           if (ansible_local|d() and ansible_local.postgresql|d() and
+                               ansible_local.postgresql.port|d())
+                           else "5432" }}'
+
+                                                                   # ]]]
 
 # .. envvar:: sentry__database_user [[[
 #
@@ -269,7 +326,10 @@ sentry__nginx_upstream:
   name: 'sentry'
   enabled: True
   type: 'default'
-  server: ['{{ sentry__config_sentry_web_host + ":" + sentry__config_sentry_web_port | string }}']
+  server: '{{ "unix:" + sentry__config_sentry_web_unix_socket
+      if sentry__config_sentry_web_unix_socket
+      else sentry__config_sentry_web_host + ":" +
+      sentry__config_sentry_web_port | string }}'
 
                                                                    # ]]]
 # .. envvar:: sentry__nginx_web_server [[[
