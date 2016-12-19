@@ -1,0 +1,27 @@
+---
+
+- name: Manage Sentry service
+  hosts: [ 'debops_service_sentry', 'debops_sentry' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: debops.nginx
+      tags: [ 'role::nginx' ]
+      nginx__upstreams:
+        - '{{ sentry__nginx_upstream }}'
+      nginx__servers:
+        - '{{ sentry__nginx_web_server }}'
+
+    - role: debops.postgresql
+      tags: [ 'depend::postgresql', 'depend::postgresql:sentry', 'depend-of::sentry', 'type::dependency' ]
+      postgresql__roles: '{{ sentry__postgresql_roles }}'
+      postgresql__databases:
+        - '{{ sentry__postgresql_database }}'
+
+    - role: ansible.sentry
+      tags: [ 'role::sentry' ]

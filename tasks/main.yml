@@ -1,0 +1,135 @@
+---
+- name: Install required packages
+  apt:
+    name: '{{ item }}'
+    state: 'present'
+  with_flattened:
+    - '{{ sentry__base_packages }}'
+    - '{{ sentry__packages }}'
+
+- name: Add sentry group
+  group:
+      name: '{{ sentry__group }}'
+      state: present
+      system: True
+
+- name: Create sentry system user
+  user:
+    name: '{{ sentry__user }}'
+    group: '{{ sentry__group }}'
+    home: '{{ sentry__home }}'
+    shell: '{{ sentry__shell }}'
+    state: 'present'
+    system: True
+
+- name: Create directories
+  file:
+    path: '{{ item }}'
+    state: 'directory'
+    owner: '{{ sentry__user }}'
+    group: '{{ sentry__group }}'
+    mode: '0755'
+  with_items:
+    - '{{ sentry__lib }}'
+    - '{{ sentry__config }}'
+
+- name: Install sentry in a virtualenv
+  pip:
+    name:       '{{ item.name | d(item) }}'
+    version:    '{{ item.version | d(omit) }}'
+    virtualenv: '{{ sentry__virtualenv }}'
+  become_user: '{{ sentry__user }}'
+  with_flattened: '{{ sentry__virtualenv_pip_packages }}'
+  register: sentry__register_virtualenv
+  changed_when: (sentry__register_virtualenv|success and
+                 sentry__register_virtualenv.stdout|search('New python executable in'))
+
+- name: Copy config files
+  template:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      owner: '{{ sentry__user }}'
+      group: '{{ sentry__group }}'
+      mode: '0640'
+  with_items:
+    - src: 'etc/sentry/sentry.conf.py.j2'
+      dest: '{{ sentry__config }}/sentry.conf.py'
+    - src: 'etc/sentry/config.yml.j2'
+      dest: '{{ sentry__config }}/config.yml'
+  notify: 'Restart sentry services'
+
+- name: Generate systemd service unit
+  template:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      owner: 'root'
+      group: 'root'
+      mode: '0644'
+  with_items:
+    - src: 'etc/systemd/system/sentry-web.service.j2'
+      dest: '/etc/systemd/system/sentry-web.service'
+    - src: 'etc/systemd/system/sentry-worker.service.j2'
+      dest: '/etc/systemd/system/sentry-worker.service'
+    - src: 'etc/systemd/system/sentry-cron.service.j2'
+      dest: '/etc/systemd/system/sentry-cron.service'
+  register: netbox__register_systemd
+  notify: 'Restart sentry services'
+
+- name: Reload systemd configuration
+  command: systemctl daemon-reload
+  when: (ansible_service_mgr == 'systemd' and
+         netbox__register_systemd|changed)
+
+- name: Enable sentry services
+  service:
+      name: '{{ item }}'
+      state: 'started'
+      enabled: True
+  with_items:
+    - sentry-web
+    - sentry-worker
+    - sentry-cron
+  notify: 'Restart sentry services'
+
+- name: Initialize or migrate database
+  command: '{{ sentry__virtualenv + "/bin/sentry --config " + sentry__config + " upgrade --noinput"}}'
+
+- name: Copy superusers script
+  template:
+    src: 'usr/local/lib/sentry/sentryusers.j2'
+    dest: '{{ sentry__lib }}/sentryusers'
+    owner: 'root'
+    group: 'root'
+    mode: '0750'
+
+- name: Get email addresses of sentry users
+  command: '{{ sentry__lib }}/sentryusers'
+  register: sentry_users
+
+- name: Create admin user
+  command: |
+    '{{ sentry__virtualenv }}'/bin/sentry
+      --config '{{ sentry__config }}' createuser
+      --email '{{ item }}'
+      --password '{{ lookup("password", secret + "/credentials/" + ansible_fqdn + "/sentry/" + item + "/password length=" + sentry__superuser_password_length) }}'
+      --superuser
+      --no-input
+  with_items: '{{ sentry__superusers }}'
+  when: item not in sentry_users.stdout
+
+- name: Configure periodical cleanup
+  cron:
+    name: 'Remove old sentry data'
+    special_time: '{{ sentry__cleanup_frequency }}'
+    state: 'present'
+    user: '{{ sentry__user }}'
+    job: '. {{ sentry__virtualenv }}/bin/sentry cleanup --days={{ sentry__cleanup_keep_days }}'
+    cron_file: 'sentry-cleanup'
+
+# Mailserver in config.yml (plus pw in conifg)
+
+# SystemD autstart script in templates
+
+# Redis bind to 127.0.1.1
+
+# Redis slave read only disable

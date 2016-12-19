@@ -1,0 +1,7 @@
+---
+
+galaxy_info: {}
+
+dependencies:
+
+    - role: debops.secret

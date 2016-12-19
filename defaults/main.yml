@@ -1,0 +1,354 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# ansible.sentry default variables [[[
+# ====================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: includes/all.rst
+
+
+# .. envvar:: sentry__base_packages [[[
+#
+# List of base packages to install.
+sentry__base_packages:
+  - 'python-setuptools'
+  - 'python-pip'
+  - 'python-dev'
+  - 'libxslt1-dev'
+  - 'gcc'
+  - 'libffi-dev'
+  - 'libjpeg-dev'
+  - 'libssl-dev'
+  - 'libxml2-dev'
+  - 'libxslt-dev'
+  - 'libyaml-dev'
+  - 'zlib1g-dev'
+  - 'libpq-dev'
+  - '{{ "python-virtualenv"
+        if (ansible_distribution_release in [ "wheezy", "precise" ])
+        else "virtualenv" }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__packages [[[
+#
+# List of additional packages to install.
+sentry__packages: []
+
+                                                                   # ]]]
+# .. envvar:: sentry__version [[[
+#
+# The version of sentry that will be used. sentry 8.10.0 needs cmake from stretch.
+sentry__version: '8.8.0'
+
+                                                                   # ]]]
+# .. envvar:: sentry__domain [[[
+#
+# The default domain used in different places of the role.
+sentry__domain: '{{ ansible_domain if ansible_domain else ansible_hostname }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__fqdn [[[
+#
+# The Fully Qualified Domain Name of Sentry.
+sentry__fqdn: '{{ "sentry." + sentry__domain }}'
+
+                                                                   # ]]]
+
+# Cleanup settings [[[
+# ---------------------------------
+
+# .. envvar:: sentry__cleanup_frequency [[[
+#
+# Cleanup frequency (daily, weekly, monthly)
+sentry__cleanup_frequency: 'weekly'
+
+                                                                   # ]]]
+# .. envvar:: sentry__cleanup_keep_days [[[
+#
+# Number of days for which to keep records during cleanup.
+sentry__cleanup_keep_days: '180'
+
+                                                                   # ]]]
+                                                                   # ]]]
+
+# Application user, group, home [[[
+# ---------------------------------
+
+# .. envvar:: sentry__user [[[
+#
+# Name of the UNIX system account used to manage sentry.
+sentry__user: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__group [[[
+#
+# Name of the UNIX primary group used to manage sentry.
+sentry__group: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__shell [[[
+#
+# The default shell set on the sentry account.
+sentry__shell: '/usr/sbin/nologin'
+                                                                   # ]]]
+                                                                   # ]]]
+# Directory paths [[[
+# -------------------
+
+# .. envvar:: sentry__home [[[
+#
+# The sentry account home directory.
+sentry__home: '{{ (ansible_local.root.home
+                   if (ansible_local|d() and ansible_local.root|d() and
+                       ansible_local.root.home|d())
+                   else "/var/local") + "/" + sentry__user }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__lib [[[
+#
+# Directory where the sentry application directory is located.
+sentry__lib: '{{ (ansible_local.root.lib
+                  if (ansible_local|d() and ansible_local.root|d() and
+                      ansible_local.root.lib|d())
+                  else "/usr/local/lib") + "/" + sentry__user }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__config [[[
+#
+# Directory where the sentry config files are located.
+sentry__config: '/etc/sentry'
+                                                                   # ]]]
+                                                                   # ]]]
+# Python virtualenv configuration [[[
+# -----------------------------------
+
+# .. envvar:: sentry__virtualenv [[[
+#
+# Path where the sentry ``virtualenv`` directory will be stored.
+sentry__virtualenv: '{{ sentry__lib + "/virtualenv" }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__virtualenv_env_path [[[
+#
+# The contents of the ``$PATH`` environment variable set for the Ansible tasks
+# which are executed inside of the sentry Python environment.
+sentry__virtualenv_env_path: '{{ sentry__virtualenv }}/bin:/usr/local/bin:/usr/bin:/bin'
+
+                                                                   # ]]]
+# .. envvar:: sentry__virtualenv_pip_packages [[[
+#
+# List of additional Python modules installed inside of the sentry
+# ``virtualenv`` environment. See :ref:`sentry__ref_virtualenv_pip_packages`
+# for more details.
+sentry__virtualenv_pip_packages:
+  - name: 'sentry'
+    version: '{{ sentry__version }}'
+                                                                   # ]]]
+                                                                   # ]]]
+
+# Sentry configuration [[[
+# -----------------------------------
+
+# .. envvar:: sentry__superusers [[[
+#
+# Name of the sentry superuser
+sentry__superusers: '{{ lookup("template", "lookup/sentry__config_admins.j2") | from_yaml }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__superuser_password_length [[[
+#
+# Length of the superuser password
+sentry__superuser_password_length: '32'
+                                                                   # ]]]
+# .. envvar:: sentry__config_secret_key [[[
+#
+# The Django secret key used by the sentry application. It will be shared by
+# all hosts on the same domain.
+sentry__config_secret_key: '{{ lookup("password", secret + "/sentry/" +
+                               sentry__domain + "/config/secret_key length=64") }}'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_single_organization [[[
+#
+# Instruct Sentry that this install intends to be run by a single organization
+# and thus various UI optimizations should be enabled.
+sentry__config_sentry_single_organization: True
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_filestore [[[
+#
+# Any Django storage backend is compatible with Sentry. For more solutions see
+# the django-storages package: https://django-storages.readthedocs.io/en/latest/
+sentry__config_sentry_filestore: 'django.core.files.storage.FileSystemStorage'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_host [[[
+#
+# Each Django storage backend has its own settings.
+sentry__config_sentry_filestore_options:
+  location: '{{ sentry__home + "/sentry-files" }}'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_host [[[
+#
+# Sentry web host
+sentry__config_sentry_web_host: '[::1]'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_port [[[
+#
+# Sentry web port
+sentry__config_sentry_web_port: 9000
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_socket [[[
+#
+# Will be preferred over a http socket otherwise set to False
+sentry__config_sentry_web_unix_socket: '/tmp/sentry.sock'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_sentry_web_options [[[
+#
+# Sentry web options
+sentry__config_sentry_web_options:
+  workers: 3          # the number of web workers
+  protocol: 'uwsgi'   # Enable uwsgi protocol instead of http
+  uwsgi-socket: '{{ sentry__config_sentry_web_unix_socket
+      if sentry__config_sentry_web_unix_socket
+      else sentry__config_sentry_web_host + ":" +
+      sentry__config_sentry_web_port | string }}'
+  chmod-socket: '660'
+  chown-socket: '{{ sentry__user }}:www-data'
+  uid: '{{ sentry__user }}'
+  gid: 'www-data'
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_secure_proxy_ssl_header [[[
+#
+# If you're using a reverse SSL proxy, you should enable the
+# X-Forwarded-Proto header
+sentry__config_secure_proxy_ssl_header: '("HTTP_X_FORWARDED_PROTO", "https")'
+
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_session_cookie_secure [[[
+#
+# If you're using a reverse SSL proxy, you should enable this setting
+sentry__config_session_cookie_secure: True
+
+                                                                   # ]]]
+
+# .. envvar:: sentry__config_csrf_cookie_secure [[[
+#
+# If you're using a reverse SSL proxy, you should enable this setting
+sentry__config_csrf_cookie_secure: True
+
+                                                                   # ]]]
+                                                                   # ]]]
+
+# Postgresql configuration [[[
+# -----------------------------------
+
+# .. envvar:: sentry__database_host [[[
+#
+# The hostname or IP address of the PostgreSQL database server
+# which should be used for the sentry database.
+sentry__database_host: '{{ ansible_local.postgresql.server
+                           if (ansible_local|d() and ansible_local.postgresql|d() and
+                               ansible_local.postgresql.server|d())
+                           else "localhost" }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__database_port [[[
+#
+# The TCP port of the PostgreSQL database server which should be
+# used for the sentry database.
+sentry__database_port: '{{ ansible_local.postgresql.port
+                           if (ansible_local|d() and ansible_local.postgresql|d() and
+                               ansible_local.postgresql.port|d())
+                           else "5432" }}'
+
+                                                                   # ]]]
+
+# .. envvar:: sentry__database_user [[[
+#
+# Name of the PostgreSQL user used by sentry.
+sentry__database_user: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__database_name [[[
+#
+# # Name of the PostgreSQL database used by sentry.
+sentry__database_name: 'sentry'
+
+                                                                   # ]]]
+# .. envvar:: sentry__postgresql_user_role [[[
+#
+# Configure settings of the postgresql role
+sentry__postgresql_user_role:
+  name: '{{ sentry__database_user }}'
+  flags:
+    - 'NOSUPERUSER'
+    - 'NOCREATEROLE'
+    - 'NOCREATEDB'
+    - 'NOINHERIT'
+    - 'NOREPLICATION'
+    - 'LOGIN'
+  db: '{{ sentry__database_name }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__postgresql_roles [[[
+#
+# FIXME: Describe what this variable is doing.
+sentry__postgresql_roles:
+  - '{{ sentry__postgresql_user_role }}'  # Password is not passed directly - it will be read from the file
+
+                                                                   # ]]]
+# .. envvar:: sentry__postgresql_database [[[
+#
+# The postgresql database name and owner used by sentry
+sentry__postgresql_database:
+  name: '{{ sentry__database_name }}'
+  owner: '{{ sentry__database_user }}'
+                                                                   # ]]]
+                                                                   # ]]]
+
+# NGINX configuration [[[
+# -----------------------------------
+
+# .. envvar:: sentry__nginx_upstream [[[
+#
+# Nginx upstream configuration
+sentry__nginx_upstream:
+  name: 'sentry'
+  enabled: True
+  type: 'default'
+  server: '{{ "unix:" + sentry__config_sentry_web_unix_socket
+      if sentry__config_sentry_web_unix_socket
+      else sentry__config_sentry_web_host + ":" +
+      sentry__config_sentry_web_port | string }}'
+
+                                                                   # ]]]
+# .. envvar:: sentry__nginx_web_server [[[
+#
+# Nginx vhost configuration
+sentry__nginx_web_server:
+  enabled: True
+  name: '{{ sentry__fqdn }}'
+  welcome: False
+  ssl: True
+  acme: False
+  root: False
+  index: False
+  favicon: True
+  redirect_to_ssl: True
+  location:
+    '/': |
+      include     uwsgi_params;
+      uwsgi_pass  sentry;
+
+# ]]]
+# ]]]
