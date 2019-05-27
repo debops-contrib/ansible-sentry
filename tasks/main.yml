@@ -123,7 +123,7 @@
     special_time: '{{ sentry__cleanup_frequency }}'
     state: 'present'
     user: '{{ sentry__user }}'
-    job: '. {{ sentry__virtualenv }}/bin/sentry cleanup --days={{ sentry__cleanup_keep_days }}'
+    job: '. {{ sentry__virtualenv }}/bin/sentry --config " + sentry__config + "cleanup --days={{ sentry__cleanup_keep_days }}'
     cron_file: 'sentry-cleanup'
 
 # Mailserver in config.yml (plus pw in conifg)

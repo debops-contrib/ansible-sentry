@@ -128,8 +128,8 @@ SENTRY_DIGESTS = 'sentry.digests.backends.redis.RedisBackend'
 # Any Django storage backend is compatible with Sentry. For more solutions see
 # the django-storages package: https://django-storages.readthedocs.io/en/latest/
 
-SENTRY_FILESTORE = '{{ sentry__config_sentry_filestore }}'
-SENTRY_FILESTORE_OPTIONS = {
+SENTRY_OPTIONS['filestore.backend'] = '{{ sentry__config_sentry_filestore }}'
+SENTRY_OPTIONS['filestore.options'] = {
 {% for key in sentry__config_sentry_filestore_options.keys() %}
     '{{ key }}': '{{ sentry__config_sentry_filestore_options[key] }}',
 {% endfor %}
@@ -141,9 +141,9 @@ SENTRY_FILESTORE_OPTIONS = {
 
 # If you're using a reverse SSL proxy, you should enable the X-Forwarded-Proto
 # header and uncomment the following settings
-SECURE_PROXY_SSL_HEADER = '{{ sentry__config_secure_proxy_ssl_header }}'
-SESSION_COOKIE_SECURE = '{{ sentry__config_session_cookie_secure | bool }}'
-CSRF_COOKIE_SECURE = '{{ sentry__config_csrf_cookie_secure | bool }}'
+SECURE_PROXY_SSL_HEADER = {{ sentry__config_secure_proxy_ssl_header | string }}
+SESSION_COOKIE_SECURE = {{ sentry__config_session_cookie_secure | bool }}
+CSRF_COOKIE_SECURE = {{ sentry__config_csrf_cookie_secure | bool }}
 
 # If you're not hosting at the root of your web server,
 # you need to uncomment and set it to the path where Sentry is hosted.
@@ -156,3 +156,6 @@ SENTRY_WEB_OPTIONS = {
     '{{ key }}': '{{ sentry__config_sentry_web_options[key] }}',
 {% endfor %}
 }
+
+# TODO: if block
+SENTRY_URL_PREFIX = '{{ sentry__config_sentry_url_prefix }}'

@@ -204,6 +204,8 @@ sentry__config_sentry_web_host: '[::1]'
 sentry__config_sentry_web_port: 9000
                                                                    # ]]]
 
+sentry__config_sentry_url_prefix: ''
+
 # .. envvar:: sentry__config_sentry_web_socket [[[
 #
 # Will be preferred over a http socket otherwise set to False
@@ -319,6 +321,8 @@ sentry__postgresql_database:
 # NGINX configuration [[[
 # -----------------------------------
 
+sentry__deploy_nginx: True
+
 # .. envvar:: sentry__nginx_upstream [[[
 #
 # Nginx upstream configuration
@@ -345,6 +349,14 @@ sentry__nginx_web_server:
   index: False
   favicon: True
   redirect_to_ssl: True
+  # Already added by sentry
+  content_type_options: False
+  # Already added by sentry
+  frame_options: False
+  # Already added by sentry
+  xss_protection: '{{ omit }}'
+  # Needs to be disabled to make csrf validation work
+  http_referrer_policy: '{{ omit }}'
   location:
     '/': |
       include     uwsgi_params;
@@ -352,3 +364,7 @@ sentry__nginx_web_server:
 
 # ]]]
 # ]]]
+
+sentry__allow: []
+
+sentry__ferm__dependent_rules: []
